@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 4
+names: ['apple', 'banana', 'bear', 'person']
+
+roboflow:
+  workspace: asem
+  project: coco-vs-synthetic
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/asem/coco-vs-synthetic/dataset/1

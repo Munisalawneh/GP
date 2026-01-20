@@ -1,0 +1,369 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+% Fast compile mode for Overleaf free plan
+\newif\ifFASTCOMPILE
+\FASTCOMPILEtrue % set to \FASTCOMPILEfalse for final (embeds figures and enables full hyperlinks)
+\ifFASTCOMPILE
+  \usepackage{graphicx}
+  \PassOptionsToPackage{draft}{graphicx}
+\fi
+\usepackage{comment}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage{enumitem}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{microtype}
+\usepackage{etoolbox}
+\usepackage{placeins}
+\usepackage{float}
+\usepackage{url}
+\usepackage{hyperref}
+
+\ifFASTCOMPILE
+  % Reduce microtype overhead during drafts
+  \microtypesetup{protrusion=false,expansion=false}
+\fi
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue
+}
+
+% Safe graphics include (avoids hard failures if a figure file is missing)
+\let\OldIncludeGraphics\includegraphics
+\newcommand{\safeincludegraphics}[2][]{%
+  \IfFileExists{#2}{\OldIncludeGraphics[#1]{#2}}{\fbox{Missing figure: \detokenize{#2}}}%
+}
+\ifFASTCOMPILE
+  \let\includegraphics\safeincludegraphics
+\fi
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+%%%%%%---------------------------------cover page
+\begin{titlepage}
+    \thispagestyle{empty} % removes header/footer on this page
+    \centering
+    \vspace*{0cm}
+    
+\begin{figure}[htbp]
+    \centering
+    \safeincludegraphics[width=0.4\linewidth]{./figs/just_logo.JPG}
+    %\caption{System architecture of the proposed Arabic Sign Language recognition model.}
+    \label{fig:logo}
+\end{figure}
+
+    
+   % {\LARGE %\textbf{Project Proposal}}\\[1.2cm]}
+    {\Huge \textbf{No Pixels, No Problem?
+    \\
+    \large Synthetic Data as the New Player Reshaping the Data World.}}\\[1.5cm]
+    {\large Final Project Report Submitted to \\
+The Department of Computer Science \\
+Faculty of Computer and Information Technology \\
+Jordan University of Science and Technology \\
+
+In Partial Fulfillment of the Requirements for the Degree of Bachelors of Science in Computer Science}\\
+
+\vspace*{1cm}
+
+
+    {\Large Prepared by:}\\[0.4cm]
+    {\Large OMAR MOHAMMED OMAR ABU AL RUB [160208]\\}
+    {\Large AYMAN AMJED NASER ALOBEDALLA [160397]\\}
+    {\Large ASEM OMAR HMOUD AL HATTAMLEH [163633]\\}
+    {\Large MUNIS MAMON JAMEEL ALAWNEH [163323]\\}
+ \vspace*{1cm}  
+    
+    { \Large Supervisor: \\}
+    {\Large  Abdullah Al-Amaren }\\[2cm]
+    
+    {\large January 2026}\\[3cm]
+    
+    \vfill
+\end{titlepage}
+%%%%---------------end of comver page -----------------
+\newpage
+\begin{figure}[htbp]
+    \centering
+    \safeincludegraphics[width=1\textwidth]{./figs/arabic_tanazol.JPG}
+    %\caption{System architecture of the proposed Arabic Sign Language recognition model.}
+    \label{fig:tanazol }
+\end{figure}
+
+
+
+%%%%%--------------------------
+
+
+\title{\textbf{No Pixels, No Problem?}\\
+\large Synthetic Data as the New Player Reshaping the Data World.}
+
+\author{\scriptsize
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}cccc}
+\parbox[t]{0.24\textwidth}{\centering
+\textbf{OMAR ABUALRUB}\\
+\textit{Department of Computer Science}\\
+\textit{Jordan University of Science and Technology}\\
+Irbid, Jordan\\
+omabualrub22@cit.just.edu.jo
+}
+&
+\parbox[t]{0.24\textwidth}{\centering
+\textbf{2\textsuperscript{rd} ASEM AL HATTAMLEH}\\
+\textit{Department of Computer Science}\\
+\textit{Jordan University of Science and Technology}\\
+Irbid, Jordan\\
+aoalhattamleh22@cit.just.edu.jo
+}
+&
+\parbox[t]{0.24\textwidth}{\centering
+\textbf{3\textsuperscript{nd} AYMAN ALOBEDALLA}\\
+\textit{Department of Computer Science}\\
+\textit{Jordan University of Science and Technology}\\
+Irbid, Jordan\\
+aaalobedalla22@cit.just.edu.jo
+}
+&
+\parbox[t]{0.24\textwidth}{\centering
+\textbf{4\textsuperscript{th} MUNIS ALAWNEH}\\
+\textit{Department of Computer Science}\\
+\textit{Jordan University of Science and Technology}\\
+Irbid, Jordan\\
+mmalawneh229@cit.just.edu.jo
+}
+\end{tabular*}
+}
+
+
+% \IEEEauthorblockN{4\textsuperscript{th} Given Name Surname}
+% \IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+% \textit{name of organization (of Aff.)}\\
+% City, Country \\
+% email address or ORCID}
+% \and
+% \IEEEauthorblockN{5\textsuperscript{th} Given Name Surname}
+% \IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+% \textit{name of organization (of Aff.)}\\
+% City, Country \\
+% email address or ORCID}
+% \and
+% \IEEEauthorblockN{6\textsuperscript{th} Given Name Surname}
+% \IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+% \textit{name of organization (of Aff.)}\\
+% City, Country \\
+% email address or ORCID}
+% (Removed stray closing brace before \maketitle)
+
+\maketitle
+
+\begin{abstract}
+
+
+The rapid progress and adoption of modern computer vision have sparked global debates about AI’s real-world reliability. However, models still rely on large, well-annotated datasets, while collecting real-world data is still expensive, slow, and often restricted by legal or physical limits. Most of the existing work on synthetic data for images continues to focus on controlled settings or narrow category subsets, making it unclear whether fully AI-generated datasets can effectively train models when data is limited and conditions are highly constrained, especially with the recent shift toward newer generative AI models. The proposal will address this gap by constructing a COCO-like dataset generated using Nano Banana Pro (Gemini 3), matching the original 80 object classes used in the standard COCO benchmark, and will evaluate how well it serves as training data for object detection models. Our pipeline will generate diverse scenes with COCO-format annotations. This work will provide an evidence-based foundation for using AI-generated datasets to accelerate model development when collecting real labeled data is difficult.
+
+
+
+
+\end{abstract}
+
+\begin{IEEEkeywords}
+Keywords: Synthetic Data, COCO Dataset, Object Detection, Data Augmentation, Nano Banana Pro, Gemini 3 , Bounding-box labeling , Prompt-based generation. 
+\end{IEEEkeywords}
+
+
+\section{Goals and Objectives}
+The goal of this study is to investigate whether a fully AI-derived dataset can provide an adequate replacement for real-world training data in modern pipeline systems when real data is expensive, restricted, or impractical to collect. The following aims are stated:
+
+\begin{itemize}
+    \item Build \textbf{SYN-COCO}, which is a fully synthetic COCO-like dataset where every image is generated using Nano Banana Pro (Gemini~3), while matching the standard MS-COCO label space of 80 object classes.
+    \item Export annotations to COCO and YOLO formats, while ensuring dataset usability and compatibility by following a clear specification of the dataset (classes, splits, versioning).
+    \item Show that prompt engineering and systematic prompt diversification create realistic, heterogeneous scenes (context, viewpoint, lighting, scale, and co-occurrence) that lessen the synthetic-to-real gap in performance.
+    \item Create a comprehensive, repeatable pipeline for generating and labeling datasets, including prompt documentation, quality control, and traceable dataset versions (so the dataset can be regenerated and audited).
+    \item Train YOLO detectors on SYN-COCO and measure cross-domain generalization using the real COCO 2017 testing set with standard COCO metrics.
+    \item Interpret transfer behavior as per-class and scale-based breakdowns and ascertain which classes and conditions are most sensitive to synthetic supervision.
+\end{itemize}
+\section{Introduction}
+Computer vision is described as the AI that \emph{sees}. But what happens when there is nothing left to look at, no large scale public dataset, no permission to use images, not having the budget to label them, and no time to wait for these procedures? In real world scenarios, the absence of data is not an exception, it's the default. Hospitals guard patient scans behind privacy and regulation, factories treat defect imagery as proprietary, and monitoring often captures the rarest events right when you do not control the camera. The question is no longer only technical. It is simultaneously practical and philosophical.  \emph{if we do not have more vision data, should progress stop?No more breakthroughs? Or should we learn to build the missing data carefully, transparently, and measurably?}\\
+
+The dominant story of progress in object detection is inseparable from benchmarking datasets. Vision systems became robust by learning from the scale and diversity of human annotated corpora such as MS-COCO \citep{lin2014coco}, and by pushing toward larger vocabularies and longer tails through datasets such as LVIS \citep{gupta2019lvis}. These datasets do more than supply images, they codify ``generalization'', shape model design, and define the metrics of these models. Yet the conditions that made them possible are public imagery, crowd annotation, and broadly shareable labels, all of these collapse in many high-value domains. Data collection became expensive, legally constrained, or ethically complicated. Annotation becomes expert-only, and the number of examples for the cases we care about the most can be near zero. In such settings, the traditional recipe of ``collect more data'' stops being advice and starts sounding like a dead end. 
+The opportunity is obvious: if images are scarce, generate them. The risk is equally obvious: if the generated world is subtly wrong, the learned model may become confidently wrong exactly in such ways real deployments cannot afford.\\
+
+Recent studies converge to one point: synthetic data is most effective when used to augment real data rather than replace it. Bay et al. (2025) \cite{bay2025impactsyntheticdataobject} compared training with synthetic data only, real data only, mixed data, and synthetic pretraining followed by real fine tuning, finding that the biggest gains come when synthetic samples are used in addition to a small amount of real data. The results are also highly dependent on how the synthetic data is generated and used during training. In a similar vein, Anderson et al. (2022) \cite{anderson2022syntheticimagedatadeep} found that CAD based synthetic images can help in low data regimes, but purely synthetic models transfer poorly because of domain gaps, making mixed training or pretraining followed by fine tuning more dependable. In a building environment, Kim et al. (2024) \cite{kim2024experimental} found that adding synthetic images improves recognition, especially for rare classes and underrepresented conditions, showing the benefit of targeted synthetic augmentation.
+Beyond accuracy, Singh et al. (2024) \cite{singh2024syntheticdataneedbenchmarking} evaluated models trained entirely on diffusion generated images and found that synthetic training can be compared to real training on some bias and calibration metrics. current work typically utilizes less robust generation pipelines that are less capable than today’s text-to-image models,thus it was considered using Nano Banana Pro (Gemini 3), a new trending realistic image generator that is currently showing SOTA results with high-quality images with strong photorealism. the approaches in the previously discussed studies still struggle more with corruptions, adversarial perturbations and of course prompt sensitivity, which makes reliable performance difficult to obtain and maintain.\\
+
+Speaking of prompts, Recent works have demonstrated the effectiveness of prompt guided text to image diffusion models for generating high quality synthetic data tailored to specific downstream tasks. \citet{bakhtiarnia2023promptmixtexttoimagediffusionmodels} proposed PromptMix , showing that mixing prompt based synthetic images with real data can significantly enhance the performance of lightweight networks , especially in low data regimes. Similarly, \citet{azizi2023syntheticdatadiffusionmodels} showed that diffusion generated synthetic images significantly improve ImageNet classification, achieving around 65\% accuracy at 256×256 and 69\% at 1024×1024 , highlighting the potential of synthetic pretraining as a scalable alternative to costly real data collection. \citet{Lei_2025} further emphasized the role of prompts by demonstrating that natural image captions serve as effective prompts for synthesizing training data , leading to consistent gains across multiple vision tasks.
+
+Beyond single image generation, \citet{wei2025mico150kcomprehensivedatasetadvancing} introduced MICo-150K, a comprehensive dataset for multi image composition, enabling models to learn complex compositional reasoning from prompt driven synthetic data and advancing research in controllable image synthesis. Focusing on the quality and usability of diffusion generated datasets, \citet{10.1007/978-981-99-3243-6_64} evaluated a large synthetic dataset created with Stable Diffusion and found that such data can effectively augment training for image classification , while also revealing limitations for fine grained and highly specific concepts. In the context of object detection, \citet{Feng_2024_CVPR} proposed InstaGen, where prompt based synthetic images are used to generate labeled detection data, significantly boosting detection performance and reducing reliance on manual annotations.
+
+Since most of these works rely on manually crafted prompts, it was proposed to use a systematic prompt generation framework driven by a Large Language Model (LLM). Instead of relying on manually crafted prompts, the LLM is will be used to automatically generate diverse, structured, and task aware prompts. These prompts are designed to produce synthetic images with varied poses, illumentation settings, object positions, viewpoints, and interactions, while encouraging creative yet realistic real life scenarios. By doing so, our approach aims to enhance diversity, reduce prompt bias, and improve the realism and applicability of diffusion-generated synthetic data for downstream vision tasks, while also accelerating dataset creation by removing the manual bottleneck in prompt authoring and enabling rapid, scalable prompt production.
+\\
+
+
+Our research is motivated by a single, under-evaluated hinge question:
+\begin{quote}
+\emph{Can an object detector trained \textbf{only} on synthetic data, generated purely from textual assumptions about a domain perform competitively when evaluated on real images?}
+\end{quote}
+
+The challenge is not only about generating convincing images; object detection also requires \emph{instance-level} labeling. Recent work has begun to address this gap by making generative pipelines more structured for example, introducing layout constraints such as bounding boxes, or by designing synthesis procedures that yield images alongside usable annotations \citep{li2023gligen,feng2024instagen}. These directions underscore a core truth: \textbf{synthetic pixels are not enough; supervision must be manufactured too.}\\
+
+In Bay et al. (2025) \cite{bay2025impactsyntheticdataobject}, the effect of synthetic data on object detection was investigated, only one class (pallets) was considered. Synthetic images were generated using NVIDIA Omniverse Replicator at different realism levels. A Faster R-CNN detector was then fine-tuned using several training settings, including real-only training, synthetic-only training, mixed real+synthetic training, and a two-stage bridged transfer setting where fine-tuning on synthetic data first and then fine-tuning on real data. It was shown that training on synthetic data alone was usually not enough to replace real data on the in-distribution test set. However, in the best synthetic-only setting, a higher result was reported than the weakest real-data baseline, where the model was trained using only 10\% of the available real training images. Stronger robustness from synthetic-only training on out-of-distribution data was reported when highly randomized synthetic images were used. The most consistent improvements were reported when synthetic data was combined with real data, especially when only a small amount of real data was available, and bridged transfer learning was reported to perform better than simple mixing in most matched comparisons. In contrast, our work is aimed at a COCO-like benchmark with 80 classes, prompt-based image generation is used with Nano Banana (Gemini 3) instead of a 3D engine pipeline, and generalization is evaluated by testing models trained on fully synthetic data on the real COCO test distribution.\\
+
+Zaripov \textit{et al.} \cite{zaripov2025creation} study synthetic data generation for an industrial inspection setting, using the example of quality control for floor coverings on a conveyor production line. Their paper motivates synthetic data as a practical alternative when video capture and manual labeling are slow and expensive, and surveys common generation toolchains ranging from game engines to generative models. They then propose a generalized synthetic data generation pipeline based on simulating the process (a digital-twin style approach) and report that the resulting images are sufficiently photorealistic and diverse to train modern detectors. In their experiments, a YOLOv8 detector trained on the synthetic dataset achieved substantially higher performance than a counterpart trained on real images from the same setting, reaching an mAP@0.50 of 0.95 versus 0.36.\\
+
+While Zaripov \textit{et al.} \cite{zaripov2025creation} demonstrate that synthetic data can be highly effective for a focused, single-process industrial line, our work targets a broader, open-world detection benchmark. Specifically, it is planned to construct a fully synthetic COCO-like dataset that follows COCO's 80 object classes, with all images generated using Nano Banana (Gemini 3) via prompt engineering. This introduces different challenges than a controlled conveyor environment, including long-tail category coverage, higher scene diversity, and more complex context. In addition, our evaluation directly measures cross-domain generalization by testing models trained only on synthetic images against the real COCO test distribution, which complements prior analyses of the synthetic-to-real domain gap in object detection \cite{ros2023domaingap,bay2025impactsyntheticdataobject}.\\
+
+
+In this work, we evaluate a pragmatic and reproducible path: generating images with text prompts, then produce labels automatically using strong vision foundation models. We operationalize this workflow through Roboflow\citep{roboflow_autolabel,roboflow_export_data,roboflow_formats} a dataset management layer that supports automated labeling, versioning, and exporting standard training formats, enabling a clean and traceable and most importantly debug-able synthetic data pipeline \citep{roboflow_autolabel,roboflow_export_data,roboflow_formats}.\\
+
+Concretely, the plan is to construct a synthetic detection dataset, \textbf{SYN-COCO}, designed to approximate the semantic and distributional structure of COCO while being created from text prompts alone \citep{lin2014coco}. then synthesize images using a modern text-to-image model \citep{google2025gemini25flashimageblog,google2025vertexgemini25flashimage} and automatically generate object detection annotations using an open-set grounding pipeline\citep{liu2023groundingdino,kirillov2023sam}, to the best of our knowledge, SYN-COCO will be the first COCO-style, fully synthetic dataset that explicitly targets complete coverage of all 80 MS-COCO object classes at scale, enabling a direct, metric-for-metric comparison against the real COCO benchmark..\\
+
+To isolate the impact of real data sources, a standard YOLO detector will be trained from scratch on our synthetic made COCO dataset ``SYN-COCO'' and evaluate it on the official real COCO 2017 test set using standard COCO metrics \citep{lin2014coco}. this would provide a benchmark of our synthetic trained model against YOLO models trained on real COCO, reporting the same YOLO evaluation metrics to quantify the approximate performance gap attributable to synthetic only training.
+
+
+Ultimately, this study is not an argument that synthetic data is a free replacement for real data. It is a controlled attempt to measure how far we can push a provocative idea: \emph{learning a detector from a world described in language, then judged in a world made of photons}. If the results are strong, it suggests that even in domains where real data is scarce or inaccessible, progress does not have to lose momentum in advancing.If the results are weak, an equally valuable outcome will be gained, a clear boundary of the reality gap and signals on what must improve, from generation and control to labeling, curation, or training.\\
+
+\noindent\textbf{this work is set out to make these contributions:}
+\begin{itemize}[leftmargin=*,itemsep=2pt,topsep=2pt]
+    \item \textbf{A synthetic-to-real benchmark question for detection:} by testing whether a detector trained \emph{only} on synthetic images generated from text can generalize to real COCO images under standard COCO metrics.
+    \item \textbf{SYN-COCO, a fully synthetic COCO-style dataset at COCO-80 scale:} by generating a COCO-like corpus covering all 80 MS-COCO classes using Nano Banana (Gemini 3) via systematic prompt engineering.
+    \item \textbf{An end-to-end, fully automated supervision pipeline:} by using LLM-driven prompt generation with text-to-image synthesis (Nano Banana Pro, Gemini 3) and automated object detection annotation through Roboflow (open-set grounding for bounding boxes), yielding a traceable, debuggable dataset construction workflow that removes manual prompt and label bottlenecks.
+
+\end{itemize}
+
+
+\section{Methodology}
+\label{sec:method}
+The proposed methodology follows a simple, testable loop: \textbf{write the world in text, render it into pixels, manufacture instance-level supervision, then let reality grade the result}. It will first use an LLM to generate diverse, structured prompts covering all 80 COCO categories, explicitly varying context, viewpoint, lighting, scale, and co-occurrence. Using these prompts, then these prompts will turn into synthesized images using Nano Banana Pro (Gemini 3) to construct a fully synthetic corpus \textbf{SYN-COCO}. Then produce bounding-box annotations in standard COCO detection format by running an automated labeling pipeline within Roboflow, keeping the entire dataset versioned and debuggable end-to-end. Finally, to isolate the synthetic-to-real gap, it will be trained on a standard YOLO detector \textbf{from scratch} on SYN-COCO and evaluate it \emph{unchanged} on the official COCO 2017 test set using standard COCO metrics, yielding a direct measurement of how far language-generated supervision can generalize before real data needs disagree.
+
+
+\subsection{Prompt Engineering and Prompt Documentation}
+\label{subsec:prompting}
+
+\subsubsection{Prompt generation pipeline}
+A two-stage prompting pipeline is adopted to increase intra-class diversity while keeping the target category fixed. The pipeline is summarized as:
+\begin{center}
+\textit{User} $\rightarrow$ \textit{Prompting LLM} $\rightarrow$ \textit{Nano Banana (Gemini 3)}
+\end{center}
+A target category (e.g., \textit{person}) is first provided to a general-purpose LLM, and multiple prompt variants are produced for the same category. Diversity is introduced by varying subject appearance (when applicable), pose, activity, camera viewpoint, lighting, and scene context. For example, for \textit{person}, prompts may describe different individuals with varied ethnic appearance performing different actions (walking, playing football, drinking, eating, watching television) under different environments and viewpoints. The resulting prompt set is then submitted to Nano Banana (Gemini 3) to generate images.
+
+\noindent\textbf{Representative prompt examples.}
+\begin{itemize}
+    \item \textbf{Apples}: \textnormal{\footnotesize
+    Photorealistic close up macro photo of several glossy green apples piled in a white ceramic bowl, warm indoor lighting, shallow depth of field, soft background blur, high detail, natural colors
+    }
+    \item \textbf{Event scene}: \textnormal{\footnotesize
+    Photorealistic candid corporate event photo in a hotel ballroom, two businessmen shaking hands in the foreground, one East Asian man in a patterned dress shirt and one older white man in a dark suit with glasses and a yellow tie holding papers, round banquet tables with place settings and attendees in the background, warm indoor lighting, realistic flash photography look, shallow depth of field, high detail
+    }
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\setlength{\tabcolsep}{4pt}
+
+\begin{tabular}{cc}
+\includegraphics[width=0.48\columnwidth]{figs/coco_apple.jpg} &
+\includegraphics[width=0.48\columnwidth]{figs/Gemini_Generated_Image_apples.png} \\
+{\scriptsize (a) Real COCO: apple} & {\scriptsize (b) Synthetic: apple} \\[2mm]
+\includegraphics[width=0.48\columnwidth]{figs/coco_event.jpg} &
+\includegraphics[width=0.48\columnwidth]{figs/Gemini_Generated_Image_event.png} \\
+{\scriptsize (c) Real COCO: event scene} & {\scriptsize (d) Synthetic: event scene} \\
+\end{tabular}
+
+\caption{Real vs. synthetic examples for apples and an event scene.}
+\label{fig:apple_event_square}
+\end{figure}
+
+
+
+
+
+\subsubsection{Quality control without adding noise}
+Because no noise is injected at generation time, quality control is performed by filtering out generation failures. A simple acceptance protocol is applied:
+\begin{itemize}
+    \item images with severe artifacts, inconsistent physics, or missing target objects are removed,
+    \item images that do not clearly contain the intended class are removed,
+    \item the rejection rate is tracked per class as an indicator of generation difficulty.
+\end{itemize}
+
+
+\subsection{Ground Truth Annotation Using Roboflow}
+\label{subsec:annotation}
+
+To obtain reliable instance level ground truth annotations for the synthetic images, Roboflow will be used as an annotation and dataset management platform ~\cite{roboflow1,roboflow2,roboflow3}. Bounding box annotations are created using Roboflow Annotate, and all object categories follow the official MS COCO 80 class taxonomy. This alignment ensures compatibility with the COCO benchmark and enables a direct comparison with models trained on real COCO data. The final annotations are exported in YOLO format and used directly for training the object detection models.
+
+The annotation process is designed to be reproducible while maintaining annotation quality. Synthetic images are uploaded to the Roboflow platform, where annotation is carried out with the support of available AI assisted tools to speed up the initial placement of bounding boxes. All annotations are then reviewed and adjusted manually to ensure accurate localization and correct class assignment. Once annotation is completed, a fixed dataset version is recorded to preserve traceability and reproducibility.
+
+To improve annotation consistency and reduce label noise, the same annotation rules are applied across the entire dataset. Bounding boxes are drawn to closely follow the visible extent of each object. When objects are partially occluded, only the visible region is annotated, and this rule is applied consistently. 
+An example of the resulting annotations is shown in Fig.\ref{fig:rf_bbox_example}, which illustrates the visual quality and consistency of the bounding box annotations applied to images generated using Nano Banana (Gemini3).
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{figs/Gemini_Generated_Image_apples_bounding_Box.jpg}
+\caption{Example Roboflow bounding box annotation for a Nano Banana (Gemini~3) generated image.}
+\label{fig:rf_bbox_example}
+\end{figure}
+
+
+\subsection{Models and Training Setup}
+In order to minimize the risk that the conclusions are restricted to a single detector implementation, multiple YOLO variations will be trained on a COCO-style synthetic dataset. YOLOv11 will be used as the main modern version baseline \cite{yolo11_ultralytics}, and YOLOv8 will be added as a complementary reference because it is widely used and is suitable for controlled ablations \cite{yolov8_ultralytics}. Since there are two generations of YOLO, it will be examined whether the observed trends hold across model versions rather than being tied to a single release. Training conditions will be kept consistent to ensure that performance differences are driven by the training data rather than by configuration changes. A single training recipe will be used, and any model-specific adjustments will be recorded. Once the final configuration is set, all runs will be listed with their complete settings, including input resolution, number of epochs, batch size, optimizer choice, learning rate schedule, augmentation configurations, and random seeds used for initialization and data shuffling. This reporting is aimed at supporting reproducibility and enabling controlled comparisons.
+
+\subsection{Evaluation Protocol on Real MS COCO}
+Generalization will be assessed by a cross-domain evaluation in which the models trained on the COCO-style synthetic dataset will be evaluated on real MS COCO to quantify the synthetic-to-real transfer gap \cite{lin2014microsoftcoco}. This protocol seeks to measure how well supervision learned from fully synthetic images transfers to real-world images under the same label space and evaluation rules. Performance will be reported using standard COCO detection metrics to ensure comparability with prior work \cite{lin2014microsoftcoco}. The primary metric will be mAP averaged over IoU thresholds from 0.50 to 0.95, with AP50 and AP75 also reported to reflect performance under looser and stricter localization requirements. Results will also be broken down by object scale using AP for small, medium, and large objects to reveal whether transfer differs by instance size. In addition, per-class AP will be reported to identify categories that benefit most from synthetic supervision and to highlight classes where the transfer gap remains substantial.
+
+\subsection{Expected Results}
+This study is anticipated to present a rich synthetic dataset and quantify in detail how well synthetic-only training generalizes to a real-world set of images under standard COCO evaluation.
+The following outcomes are anticipated:
+
+\begin{itemize}
+    \item \textbf{A complete, versioned COCO-style synthetic dataset (SYN-COCO):} full coverage of all 80 MS-COCO classes, with prompts and generation settings documented for reproducibility.
+    \item \textbf{High-quality bounding-box annotations ready for training:} labels exported in COCO and YOLO formats, enabling direct use with common object detection pipelines.
+    \item \textbf{Meaningful synthetic-to-real transfer on COCO:} YOLO models trained only on SYN-COCO are expected to achieve non-trivial mAP on the real COCO 2017 testing set, narrowing the gap relative to small-data real baselines.
+     \item \textbf{Evidence for the role of prompt diversity and filtering:} systematic prompt variation and consistent quality control are expected to reduce common failure cases, while per-class rejection rates will highlight categories that are harder to synthesize reliably.
+\end{itemize}
+
+
+
+\section{Conclusion and Future Work} 
+In this work, an investigation will be conducted into how far synthetic data can act as a separate training source for object detection. By creating an entirely synthetic, COCO-style dataset and evaluating models trained on it against real COCO images, the study will be expected to quantify the synthetic-to-real gap in a direct and measurable way. The results will be useful for determining the thresholds for synthetic-only training, and for identifying when real-world data will remain needed to support a trustworthy outcome. Most importantly, synthetic data will be acknowledged as “more than image generation”. A novel way for visual supervision to be created will be presented when real image data is expensive, limited, or restricted. In that sense, a path that could really reshape how vision datasets are built will be led to by the study.
+\\
+\noindent \textbf{Future extensions.} A number of practical extensions could be taken in order to increase contribution and to put the approach under more demanding, and more realistic conditions:
+\begin{itemize}[leftmargin=*,itemsep=2pt,topsep=2pt]
+    \item \textbf{ Beyond object detection:} The pipeline can be generalized beyond object detection to other vision tasks that require richer supervision, such as classification, instance segmentation, object tracking, and keypoint detection, to evaluate whether synthetic-only supervision remains viable for more structured outputs.
+
+    \item \textbf{Custom YOLO architecture:} A YOLO-based detector can be developed and trained on synthetic data only, with architectural and training modifications introduced to mitigate sensitivity to synthetic artifacts and prompt-induced biases and benchmarked against standard YOLO baselines for identical samples.
+    \item \textbf{Domain-specific datasets for hard data collection:} A synthetic dataset generation pipeline can be developed for domains where the acquisition of real data is challenging, expensive, or limited (for example medical imaging, drone inspection, underwater robotics) and tested on real domain test and expert-labeled subsets to measure transfer and reliability.
+\end{itemize}
+
+
+
+\begin{comment}
+
+\paragraph{Contributions.}
+\begin{itemize}[leftmargin=1.2em]
+ \item We introduce \textbf{SYN-COCO}, a promptvengineered, COCO formatted synthetic object detection dataset generated from text only assumptions.
+ \item We propose a fully automated supervision pipeline using \textbf{Grounding DINO} \citep{liu2023groundingdino} and \textbf{SAM} \citep{kirillov2023sam} to produce instance labels for synthetic images at scale.
+ \item We integrate a reproducible dataset layer (Roboflow) for dataset versioning, preprocessing, and export, enabling consistent synthetic-to-training handoff in standard formats \citep{roboflow_preprocess,roboflow_export_data,roboflow_formats}.
+ \item We provide a rigorous evaluation protocol: training a YOLO detector \emph{from scratch} on synthetic data and benchmarking directly on \emph{real} COCO validation images \citep{lin2014coco}.
+ \item We quantify and analyze the \textbf{reality gap} through metric breakdowns and qualitative failure modes, yielding practical guidance for when synthetic-only training is viable and when it is not.
+\end{itemize}
+
+\end{comment}
+
+\bibliographystyle{IEEEtranN}
+\bibliography{references}
+
+\end{document}
