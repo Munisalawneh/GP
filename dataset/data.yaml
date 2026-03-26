@@ -1,0 +1,28 @@
+# Synthetic COCO Dataset Configuration (Classes 40-59)
+# YOLOv11 compatible
+
+path: ../dataset
+train: images
+val: images
+
+names:
+  40: wine glass
+  41: cup
+  42: fork
+  43: knife
+  44: spoon
+  45: bowl
+  46: banana
+  47: apple
+  48: sandwich
+  49: orange
+  50: broccoli
+  51: carrot
+  52: hot dog
+  53: pizza
+  54: donut
+  55: cake
+  56: chair
+  57: couch
+  58: potted plant
+  59: bed

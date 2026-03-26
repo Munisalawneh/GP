@@ -1,0 +1,24 @@
+# API keys and secrets
+pipeline/.env
+
+# Generated data (large files)
+dataset/images/
+dataset/labels/
+dataset/boxed_previews/
+dataset/tracking.xlsx
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.Python
+env/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
