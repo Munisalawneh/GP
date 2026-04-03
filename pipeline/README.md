@@ -1,106 +1,144 @@
 # Playwright Pipeline — Synthetic COCO Image Generation
 
-Automated image generation pipeline using **Playwright** to interact with Google Gemini's web interface. Generates photorealistic synthetic images for COCO classes 40–59 (20 classes, 200 images each = 4,000 total), with automatic labeling via Roboflow.
-
-## Why Playwright?
-
-The Gemini API has strict daily quotas. This pipeline automates the Gemini **website** using a real browser session, supporting **multiple Google accounts** with automatic rotation when one hits its daily image generation limit.
+Automated image generation pipeline using **Playwright** to control Google Gemini's web interface. Generates photorealistic synthetic images for COCO classes 40–59 (20 classes, 200 images each).
 
 ---
 
-## Environment Setup
+## Full Setup Guide (Start to Finish)
 
-### Prerequisites
+### 1. Install Conda
 
-- **Python 3.11+**
-- **Conda** (recommended) or virtualenv
-- **Google account(s)** with Gemini Pro access
-- **Roboflow API key** (for auto-labeling)
+If you don't have Conda installed:
+- Download **Miniconda** from: https://docs.conda.io/en/latest/miniconda.html
+- Run the installer, check "Add to PATH" during setup
+- Restart your terminal after installation
 
-### 1. Create Conda Environment
+Verify it works:
+
+```bash
+conda --version
+```
+
+### 2. Clone the Repository
+
+```bash
+git clone https://github.com/Munisalawneh/GP.git
+cd GP
+git checkout Playwright-pipeline
+```
+
+### 3. Create the Python Environment
 
 ```bash
 conda create -n grad python=3.11 -y
 conda activate grad
 ```
 
-### 2. Install Dependencies
+> **IMPORTANT:** You must run `conda activate grad` every time you open a new terminal before running any pipeline commands.
+
+### 4. Install Python Dependencies
 
 ```bash
 pip install -r pipeline/requirements.txt
 ```
 
-### 3. Install Playwright Browser
+This installs:
+
+| Package        | Version | Purpose                              |
+|----------------|---------|--------------------------------------|
+| playwright     | 1.58.0  | Browser automation for Gemini        |
+| Pillow         | 12.1.1  | Image resizing                       |
+| google-genai   | 1.68.0  | Gemini API client (fallback)         |
+| python-dotenv  | 1.2.2   | Load `.env` config files             |
+| requests       | 2.32.5  | HTTP requests for Roboflow labeling  |
+| openpyxl       | 3.1.5   | Excel tracking spreadsheet           |
+
+### 5. Install the Chromium Browser for Playwright
 
 ```bash
 playwright install chromium
 ```
 
-### 4. Configure Environment Variables
+This downloads a Chromium browser that Playwright will control. It's separate from your regular Chrome — nothing changes on your system.
 
-Create a `pipeline/.env` file:
+### 6. Set Up API Keys
+
+Create a file called `.env` inside the `pipeline/` folder:
+
+```bash
+# On Windows:
+notepad pipeline\.env
+
+# Or on Mac/Linux:
+nano pipeline/.env
+```
+
+Paste this into the file and fill in your keys:
 
 ```env
-# Gemini API keys (optional — only needed for API-based generation)
-GEMINI_API_KEY_1=your_key_here
-GEMINI_API_KEY_2=your_key_here
-GEMINI_API_KEY_3=your_key_here
+# Roboflow API key (REQUIRED for auto-labeling)
+# Get yours at: https://app.roboflow.com → Settings → API Key
+ROBOFLOW_API_KEY=your_roboflow_api_key_here
 
-# Roboflow (required for auto-labeling)
-ROBOFLOW_API_KEY=your_roboflow_key
+# Gemini API keys (OPTIONAL — only needed for API-based generation, not Playwright)
+GEMINI_API_KEY_1=
+GEMINI_API_KEY_2=
+GEMINI_API_KEY_3=
 ```
 
----
+Save and close.
 
-## Project Structure
+### 7. Log In Your Google Account(s)
 
-```
-pipeline/
-├── gemini_web.py          # Playwright-based Gemini web automation (main entry)
-├── config.py              # Configuration: API keys, paths, COCO classes 40-59
-├── prompt_engine.py       # Prompt generation (97,020 combos per class)
-├── generate_images.py     # API-based generation (fallback, quota-limited)
-├── label_images.py        # Auto-labeling via Roboflow COCO model
-├── run_pipeline.py        # CLI runner for API pipeline + labeling
-├── tracker.py             # Excel tracking for generation progress
-├── upload_to_roboflow.py  # Upload dataset to Roboflow
-├── requirements.txt       # Python dependencies
-├── .env                   # API keys (not committed)
-└── .playwright_profiles/  # Browser profiles per account (not committed)
-    ├── account_1/
-    ├── account_2/
-    ├── account_3/
-    └── account_4/
-```
-
----
-
-## Usage
-
-### Step 1: Log In to Google Accounts
-
-Run this once per account. A Chromium browser will open — log in to your Google account, then close the browser window.
+This is the most important step. You need to log in to at least **one** Google account that has Gemini Pro access.
 
 ```bash
 conda activate grad
-
 python pipeline/gemini_web.py --login 1
+```
+
+**What happens:**
+1. A Chromium browser window opens and goes to gemini.google.com
+2. You log in to your Google account manually (email + password + 2FA if enabled)
+3. Wait until you see the Gemini chat interface
+4. **Close the browser window** (just click the X button)
+5. Your login session is saved in `pipeline/.playwright_profiles/account_1/`
+
+**To add more accounts** (for faster generation with account rotation):
+
+```bash
 python pipeline/gemini_web.py --login 2
 python pipeline/gemini_web.py --login 3
 python pipeline/gemini_web.py --login 4
 ```
 
-Each account gets its own persistent browser profile in `.playwright_profiles/account_N/`.
+Each account needs a **different** Google account. Log in, see the chat, close the browser.
 
-### Step 2: Generate Images
+> **Note:** You only need to do this login step once per account. The session is saved and reused automatically.
 
-**Generate all remaining images across all classes:**
+---
+
+## How to Generate Images
+
+Always activate the environment first:
+
+```bash
+conda activate grad
+```
+
+### Generate ALL remaining images (recommended):
 
 ```bash
 python pipeline/gemini_web.py --all-remaining
 ```
 
-**Generate images for a specific class:**
+This will:
+- Check which classes still need images
+- Start generating from where it left off
+- Automatically skip images that already exist
+- Rotate between accounts when one hits the daily limit
+
+### Generate a specific class:
 
 ```bash
 python pipeline/gemini_web.py --class donut --start 32 --end 200
@@ -108,67 +146,62 @@ python pipeline/gemini_web.py --class bed --start 114 --end 200
 python pipeline/gemini_web.py --class "potted plant" --start 21 --end 200
 ```
 
-### Step 3: Label Images
-
-After generating images, auto-label them using the Roboflow COCO detection model:
+### Label images after generating:
 
 ```bash
-python pipeline/run_pipeline.py label
+python pipeline/run_pipeline.py label         # label all classes
+python pipeline/run_pipeline.py label 54      # label only donuts (class 54)
 ```
-
-Or label a specific class by COCO ID:
-
-```bash
-python pipeline/run_pipeline.py label 54   # label donuts (class 54)
-python pipeline/run_pipeline.py label 59   # label beds (class 59)
-```
-
-Labels are saved in YOLO format (`dataset/labels/<class>/`).
 
 ---
 
-## How It Works
+## Troubleshooting
 
-### Prompt Engine
+### "No accounts logged in!"
+You haven't run the login step. Run `python pipeline/gemini_web.py --login 1` first.
 
-Each image uses a unique prompt generated from 5 variation dimensions:
+### Browser opens but Gemini doesn't load
+Your Google account might not have Gemini access, or there's a regional restriction. Try a different account.
 
-| Dimension       | Options |
-|-----------------|---------|
-| Object state    | 12      |
-| Scene           | 15      |
-| Viewpoint       | 7       |
-| Lighting        | 7       |
-| Disturbance     | 11      |
+### "can't generate more images today"
+You've hit Gemini's daily limit on that account. The script will automatically switch to the next account. If all accounts are exhausted, wait until tomorrow or add more accounts.
 
-Total: **97,020 unique combinations per class**, deterministically sampled with `seed=42`.
+### Timeout errors on input field
+The page didn't load properly. The script will automatically retry with a page refresh. If it keeps happening, try:
+1. Run `python pipeline/gemini_web.py --login N` again for that account number
+2. Make sure you can access gemini.google.com manually in a regular browser
 
-### Multi-Account Rotation
-
-1. Starts with account #1
-2. When Gemini responds with "can't generate more images today", marks that account as exhausted
-3. Automatically switches to the next available account
-4. Retries the failed image with the new account
-5. Stops when all accounts are exhausted
-
-### Error Recovery
-
-- **Page not ready**: Dismisses consent/welcome dialogs, retries with page refresh (up to 3 attempts)
-- **Single failure**: Automatically retries once with a fresh page
-- **5+ consecutive failures**: Full page refresh before next attempt
-- **Rate limit**: Switches account and retries immediately
-
-### Image Download Methods
-
-Three fallback methods (tried in order):
-
-1. **Download button** — clicks "Download full size image"
-2. **URL fetch** — fetches the image `src` URL directly (supports base64 data URIs)
-3. **Screenshot** — screenshots the image element as a last resort
-
-All images are resized to **1408×768** (pipeline standard).
+### `conda activate grad` doesn't work
+Make sure Conda is installed and initialized:
+```bash
+conda init powershell   # Windows
+conda init bash         # Mac/Linux
+```
+Then restart your terminal.
 
 ---
+
+## Project Structure
+
+```
+pipeline/
+├── gemini_web.py          # Main script — Playwright web automation
+├── config.py              # Configuration: paths, COCO classes 40-59
+├── prompt_engine.py       # Generates unique prompts (97,020 combos/class)
+├── generate_images.py     # API-based generation (fallback)
+├── label_images.py        # Auto-labeling via Roboflow
+├── run_pipeline.py        # CLI for labeling
+├── tracker.py             # Progress tracking (Excel)
+├── upload_to_roboflow.py  # Upload dataset to Roboflow
+├── requirements.txt       # Python dependencies
+├── .env                   # API keys (DO NOT commit)
+└── .playwright_profiles/  # Browser login sessions (DO NOT commit)
+```
+
+## Output
+
+Generated images go to `dataset/images/<class_name>/` (1408×768 PNG).
+Labels go to `dataset/labels/<class_name>/` (YOLO format `.txt` files).
 
 ## COCO Classes (40–59)
 
@@ -184,41 +217,3 @@ All images are resized to **1408×768** (pipeline standard).
 | 47 | apple        | 57 | couch        |
 | 48 | sandwich     | 58 | potted plant |
 | 49 | orange       | 59 | bed          |
-
----
-
-## Output
-
-```
-dataset/
-├── images/
-│   ├── wine_glass/     # 200 PNG images (1408×768)
-│   ├── cup/
-│   ├── ...
-│   └── bed/
-├── labels/
-│   ├── wine_glass/     # 200 YOLO-format .txt label files
-│   ├── cup/
-│   └── ...
-└── boxed_previews/     # images with bounding boxes drawn (for QA)
-```
-
-### Label Format (YOLO)
-
-Each `.txt` file contains one line per detected object:
-
-```
-<class_id> <x_center> <y_center> <width> <height>
-```
-
-All values are normalized (0–1) relative to image dimensions.
-
----
-
-## Notes
-
-- Always activate the conda environment before running: `conda activate grad`
-- Browser profiles in `.playwright_profiles/` contain login sessions — do **not** commit them
-- The `.env` file contains API keys — do **not** commit it
-- Images that already exist are automatically skipped (safe to re-run)
-- The script uses `headless=False` (visible browser) so you can monitor progress
