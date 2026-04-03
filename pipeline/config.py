@@ -8,7 +8,18 @@ from dotenv import load_dotenv
 # ─── Load .env ───────────────────────────────────────────────────────────────
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_API_KEYS = [
+    os.getenv("GEMINI_API_KEY_1"),
+    os.getenv("GEMINI_API_KEY_2"),
+    os.getenv("GEMINI_API_KEY_3"),
+]
+# Filter out any None values (in case a coworker only has 1 key)
+GEMINI_API_KEYS = [k for k in GEMINI_API_KEYS if k]
+
+# Vertex AI config (uses Application Default Credentials)
+VERTEX_PROJECT = os.getenv("VERTEX_PROJECT")  # e.g. "gen-lang-client-0019327901"
+VERTEX_LOCATION = os.getenv("VERTEX_LOCATION", "us-central1")
+
 ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY")
 
 # ─── Paths ───────────────────────────────────────────────────────────────────
@@ -21,6 +32,7 @@ TRACKING_FILE = os.path.join(DATASET_DIR, "tracking.xlsx")
 
 # ─── Model Settings ─────────────────────────────────────────────────────────
 GEMINI_MODEL = "gemini-3-pro-image-preview"
+VERTEX_MODEL = "gemini-2.5-flash-image"  # gemini-3-pro needs allowlisting on Vertex AI
 ROBOFLOW_MODEL_URL = "https://detect.roboflow.com/coco/22"
 
 # ─── COCO Classes 40-59 ─────────────────────────────────────────────────────
@@ -51,5 +63,5 @@ CLASSES = {
 CLASS_NAME_TO_ID = {name: cid for cid, name in CLASSES.items()}
 
 # ─── Generation Settings ────────────────────────────────────────────────────
-IMAGES_PER_CLASS_PHASE_A = 1   # Phase A: verification
-IMAGES_PER_CLASS_PHASE_B = 20  # Phase B: full dataset
+IMAGES_PER_CLASS_PHASE_A = 1    # Phase A: verification
+IMAGES_PER_CLASS_PHASE_B = 200  # Phase B: full dataset (200 per class)

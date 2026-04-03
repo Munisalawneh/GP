@@ -1,6 +1,13 @@
 # API keys and secrets
 pipeline/.env
 
+# Playwright browser profiles (contain login sessions)
+pipeline/.playwright_profiles/
+pipeline/.playwright_profile/
+
+# Debug screenshots
+pipeline/gemini_debug*.png
+
 # Generated data (large files)
 dataset/images/
 dataset/labels/

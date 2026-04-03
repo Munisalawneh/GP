@@ -16,10 +16,8 @@ import os
 # Ensure pipeline/ is on path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from google import genai
-
-from config import GEMINI_API_KEY, CLASSES, DATASET_DIR, IMAGES_DIR
-from generate_images import run_phase_a, run_phase_b, sanitize_name
+from config import GEMINI_API_KEYS, CLASSES, DATASET_DIR, IMAGES_DIR, VERTEX_PROJECT, VERTEX_LOCATION
+from generate_images import GeminiKeyRotator, run_phase_a, run_phase_b, sanitize_name
 from label_images import label_class
 from tracker import log_entry
 from upload_to_roboflow import upload_to_roboflow
@@ -27,7 +25,8 @@ from upload_to_roboflow import upload_to_roboflow
 
 def run_generate_and_label(phase: str, class_ids: list[int] | None = None):
     """Run generation + labeling + tracking for a phase."""
-    client = genai.Client(api_key=GEMINI_API_KEY)
+    rotator = GeminiKeyRotator(GEMINI_API_KEYS, vertex_project=VERTEX_PROJECT,
+                                vertex_location=VERTEX_LOCATION)
     target_ids = class_ids or list(CLASSES.keys())
 
     # ── Stage 1: Generate ────────────────────────────────────────────────
@@ -36,9 +35,9 @@ def run_generate_and_label(phase: str, class_ids: list[int] | None = None):
     print("=" * 60)
 
     if phase.upper() == "A":
-        gen_results = run_phase_a(client, target_ids)
+        gen_results = run_phase_a(rotator, target_ids)
     else:
-        gen_results = run_phase_b(client, target_ids)
+        gen_results = run_phase_b(rotator, target_ids)
 
     print(f"\n✓ Generated {len(gen_results)} images")
 

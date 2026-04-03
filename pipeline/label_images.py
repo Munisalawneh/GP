@@ -141,6 +141,10 @@ def label_class(class_id: int):
         label_path = os.path.join(lbl_dir, label_name)
         preview_path = os.path.join(prv_dir, fname)
 
+        if os.path.exists(label_path):
+            print(f"  [SKIP] {fname} — already labeled")
+            continue
+
         print(f"  [LABEL] {fname}")
 
         yolo_lines, predictions = label_image(image_path)
