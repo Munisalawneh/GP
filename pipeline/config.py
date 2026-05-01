@@ -20,7 +20,7 @@ GEMINI_API_KEYS = [k for k in GEMINI_API_KEYS if k]
 VERTEX_PROJECT = os.getenv("VERTEX_PROJECT")  # e.g. "gen-lang-client-0019327901"
 VERTEX_LOCATION = os.getenv("VERTEX_LOCATION", "us-central1")
 
-ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY")
+ROBOFLOW_API_KEY = (os.getenv("ROBOFLOW_API_KEY") or "").strip()
 
 # ─── Paths ───────────────────────────────────────────────────────────────────
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

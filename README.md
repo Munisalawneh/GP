@@ -1,170 +1,156 @@
-# SYN-COCO: Synthetic COCO Dataset Pipeline
+# SYN-COCO
 
-A pipeline for generating photorealistic synthetic images using **Gemini 3 (Nano Banana)**, auto-labeling them with **Roboflow**, and producing a YOLO-compatible dataset that mirrors the 80-class COCO structure.
+SYN-COCO is a computer vision research project for testing whether AI-generated images can reduce the performance gap when real object-detection data is hard, expensive, or impractical to collect.
 
-## Goal
+The dataset follows the MS COCO object-detection label space and uses synthetic images generated with Nano Banana (Gemini 3). The public Roboflow dataset version is:
 
-Demonstrate that AI-generated images with carefully engineered prompts can reduce the performance gap in object detection tasks where real-world data is scarce, expensive, or impractical to obtain.
+https://app.roboflow.com/munisdrafts/syn-coco-qdonc-hopnq/2
 
-## Project Structure
+The experiment trains YOLO26 models on the synthetic dataset, then evaluates them on real COCO validation images to measure synthetic-to-real transfer.
 
-```
+## Project Layout
+
+```text
 GP/
-├── coco.yaml                         # Original COCO 80-class reference
-├── requirements.txt                  # Python dependencies
-├── SYN_COCO.pdf                      # Research paper draft
-│
-├── pipeline/                         # All pipeline code
-│   ├── .env                          # API keys (DO NOT commit — gitignored)
-│   ├── config.py                     # Paths, class definitions, model settings
-│   ├── prompt_engine.py              # Prompt generation with 5-dimension variation grid
-│   ├── generate_images.py            # Stage 1: Gemini image generation
-│   ├── label_images.py               # Stage 2: Roboflow auto-labeling + boxed previews
-│   ├── tracker.py                    # Stage 3: Excel logging (tracking.xlsx)
-│   ├── upload_to_roboflow.py         # Upload images + labels to Roboflow for adjustment
-│   └── run_pipeline.py               # Master orchestrator
-│
-├── dataset/                          # Generated dataset (gitignored)
-│   ├── data.yaml                     # YOLO dataset config
-│   ├── tracking.xlsx                 # Auto-generated: image | prompt | labels | metadata
-│   ├── images/{class_name}/          # Generated images organized by class
-│   ├── labels/{class_name}/          # YOLO label files (class_id x_center y_center w h)
-│   └── boxed_previews/{class_name}/  # Visual QA: images with bounding boxes drawn
-│
-└── COCO VS SYN/                      # Comparison experiments
+  README.md
+  results.txt
+  coco.yaml
+  requirements.txt
+  SYN_YOLO26x_Traning.ipynb
+  relabel_dataset.py
+  pipeline/
+    config.py
+    prompt_engine.py
+    generate_images.py
+    gemini_web.py
+    label_images.py
+    run_pipeline.py
+    tracker.py
+    upload_to_roboflow.py
+    upload_sdk.py
+    validate_dataset.py
+    redistribute.py
+  SYN_COCO/
+    data.yaml
+    train/images/
+    train/labels/
+    valid/images/
+    valid/labels/
+  weights/
+    SYN_YOLO26s.pt
+    SYN_YOLO26m.pt
+    SYN_YOLO26l.pt
+    SYN_YOLO26x.pt
+  SYN_COCO Overleaf/
+  COCO VS SYN/
 ```
 
-## Quick Start
+## Important Files
 
-### 1. Create Conda Environment
+| File | Purpose |
+| --- | --- |
+| `SYN_YOLO26x_Traning.ipynb` | Main training and evaluation notebook. Downloads/locates SYN-COCO, trains YOLO26, builds real COCO validation labels, and records metrics. |
+| `results.txt` | Current SYN validation and real COCO validation metrics for YOLO26n/s/m/l/x. |
+| `SYN_COCO/data.yaml` | Roboflow YOLO26 dataset config used by training. |
+| `coco.yaml` | COCO 2017 reference label map and Ultralytics dataset config. |
+| `pipeline/gemini_web.py` | Playwright automation for Gemini web image generation with account rotation. |
+| `pipeline/prompt_engine.py` | Prompt variation engine for realistic COCO-style scenes. |
+| `pipeline/label_images.py` | Roboflow COCO model labeling and boxed preview generation. |
+| `pipeline/upload_sdk.py` | Roboflow SDK upload path for relabeled datasets. |
+| `pipeline/validate_dataset.py` | Dataset image/label validation helper. |
+| `relabel_dataset.py` | Relabels local images with YOLO26x and writes YOLO labels. |
 
-```bash
+## Research Workflow
+
+1. Generate diverse synthetic images using engineered prompts.
+2. Annotate images in Roboflow and export YOLO26 format.
+3. Train YOLO26 models on SYN-COCO.
+4. Evaluate trained weights on SYN-COCO validation.
+5. Convert real COCO val2017 annotations into the matching YOLO label space.
+6. Evaluate the same trained weights on real COCO val2017.
+7. Compare synthetic validation scores against real validation scores.
+
+## Setup
+
+```powershell
 conda create -n grad python=3.11 -y
 conda activate grad
-```
-
-### 2. Install Dependencies
-
-```bash
 pip install -r requirements.txt
+pip install -r pipeline/requirements.txt
+playwright install chromium
 ```
 
-### 3. Set Up API Keys
+Create `pipeline/.env`:
 
-Create the file `pipeline/.env` with your keys:
-
-```
-GEMINI_API_KEY=your_gemini_api_key_here
+```env
 ROBOFLOW_API_KEY=your_roboflow_api_key_here
+GEMINI_API_KEY_1=
+GEMINI_API_KEY_2=
+GEMINI_API_KEY_3=
 ```
 
-> **Important:** Never commit this file. It is already in `.gitignore`.
+For Gemini web generation, log in once per account:
 
-### 4. Configure Your Classes
-
-Open `pipeline/config.py` and update the `CLASSES` dictionary to match **your assigned class range**. The current config uses classes 40–59:
-
-```python
-CLASSES = {
-    40: "wine glass",
-    41: "cup",
-    ...
-    59: "bed",
-}
+```powershell
+python pipeline/gemini_web.py --login 1
+python pipeline/gemini_web.py --login 2
 ```
 
-If you are working on a different range (e.g., 0–19 or 60–79), replace the dictionary with your classes from `coco.yaml`.
+## Dataset Generation
 
-Also update `IMAGES_PER_CLASS_PHASE_B` if you want more or fewer images per class.
+Generate remaining images:
 
-### 5. Update Prompt Engine
-
-Open `pipeline/prompt_engine.py` and add entries for your classes in:
-
-- **`OBJECT_STATES`** — 5 variations describing the object in different states, with other COCO objects co-occurring in the scene.
-- **`CLASS_CATEGORY`** — Map each class name to a scene category (`"kitchen_item"`, `"food"`, `"furniture"`, etc.). Add new categories in `SCENES` if needed.
-
-Each prompt is assembled from 5 dimensions:
-| Dimension | Purpose |
-|-----------|---------|
-| Object state | What the object looks like + surrounding objects |
-| Scene | Environment / location |
-| Viewpoint | Camera angle |
-| Lighting | Light source and quality |
-| Disturbance | Noise, blur, occlusion, clutter |
-
-### 6. Run the Pipeline
-
-All commands are run from the `pipeline/` directory:
-
-```bash
-cd pipeline
+```powershell
+python pipeline/gemini_web.py --all-remaining
 ```
 
-**Phase A — Generate 1 image per class for verification:**
-```bash
-python run_pipeline.py A              # All your classes
-python run_pipeline.py A 46 47 48     # Specific classes only
+Generate a class range manually:
+
+```powershell
+python pipeline/gemini_web.py --class banana --start 1 --end 200
+python pipeline/gemini_web.py --class "potted plant" --start 1 --end 200
 ```
 
-**Phase B — Generate 20 images per class with prompt variations:**
-```bash
-python run_pipeline.py B              # All your classes
-python run_pipeline.py B 46           # One class at a time
+Label generated images:
+
+```powershell
+python pipeline/run_pipeline.py label
 ```
 
-**Label only (images already exist, re-run labeling):**
-```bash
-python run_pipeline.py label
-python run_pipeline.py label 46 47
+Upload image/label pairs to Roboflow:
+
+```powershell
+python pipeline/upload_sdk.py --dataset-root dataset --tag SYN-COCO
 ```
 
-**Upload to Roboflow for manual annotation adjustment:**
-```bash
-python run_pipeline.py upload your-roboflow-project-id
-python run_pipeline.py upload your-roboflow-project-id 46 47 48
-```
+## Training And Evaluation
 
-### 7. Review Results
+Use `SYN_YOLO26x_Traning.ipynb` for the full training/evaluation flow.
 
-- **Boxed previews** — Check `dataset/boxed_previews/{class}/` to visually verify bounding boxes.
-- **Excel tracking** — Open `dataset/tracking.xlsx` to see every image with its prompt, labels, detection count, and timestamp.
-- **YOLO labels** — `dataset/labels/{class}/` contains one `.txt` per image in YOLO format.
+Main notebook stages:
 
-## Pipeline Stages
+1. Verify GPU and Python environment.
+2. Locate or download the Roboflow SYN-COCO export.
+3. Prepare `data_fixed.yaml` with absolute dataset paths.
+4. Download COCO val2017 images and annotations.
+5. Train YOLO26 on SYN-COCO.
+6. Evaluate on SYN-COCO validation.
+7. Convert COCO val2017 annotations to YOLO labels.
+8. Evaluate on real COCO val2017.
 
-| Stage | Script | What It Does |
-|-------|--------|-------------|
-| 1 | `generate_images.py` | Calls Gemini 3 to generate photorealistic images per class |
-| 2 | `label_images.py` | Sends images to Roboflow COCO model, converts to YOLO labels, draws boxed previews |
-| 3 | `tracker.py` | Logs image name, prompt, labels, and metadata to `tracking.xlsx` |
+Current results:
 
-## Label Format
-
-Labels use **COCO class IDs** (not 0-indexed per batch), so all team members' datasets are directly compatible:
-
-```
-<coco_class_id> <x_center> <y_center> <width> <height>
-```
-
-All coordinates are normalized (0–1). Example for a banana image:
-```
-46 0.495739 0.406901 0.417614 0.454427
-56 0.075994 0.186198 0.150568 0.226562
-```
-
-## Class Assignments
-
-| Range | Classes | Assignee |
-|-------|---------|----------|
-| 0–19  | person → cow | TBD |
-| 20–39 | elephant → bottle | TBD |
-| 40–59 | wine glass → bed | Muni |
-| 60–79 | dining table → toothbrush | TBD |
+| SYN Model | SYN mAP50-95 | SYN mAP50 | SYN mAP75 | REAL mAP50-95 | REAL mAP50 | REAL mAP75 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| YOLO26n | 0.539213 | 0.694938 | 0.596969 | 0.138968 | 0.212157 | 0.148705 |
+| YOLO26s | 0.667051 | 0.778553 | 0.717442 | 0.250638 | 0.360981 | 0.269858 |
+| YOLO26m | 0.704938 | 0.807951 | 0.754258 | 0.227839 | 0.327709 | 0.245538 |
+| YOLO26l | 0.755635 | 0.845381 | 0.804426 | 0.352206 | 0.487931 | 0.384526 |
+| YOLO26x | 0.766471 | 0.855739 | 0.822162 | 0.393776 | 0.546147 | 0.431982 |
 
 ## Notes
 
-- The pipeline **skips** images that already exist (safe to re-run).
-- Rate limiting (2s delay) is built in to respect API quotas.
-- Phase B uses a **deterministic seed** (`seed=42`) so prompts are reproducible.
-- Prompts are designed for COCO-style realism: multi-object scenes, occlusion, noise, casual phone-photo quality — not clean studio shots.
+- Keep API keys in `pipeline/.env`.
+- Keep generated datasets, trained weights, COCO downloads, and browser profiles local.
+- Use `results.txt` as the quick metric summary.
+- Use the notebook when exact training and real COCO evaluation parity matters.

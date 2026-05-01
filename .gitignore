@@ -13,6 +13,20 @@ dataset/images/
 dataset/labels/
 dataset/boxed_previews/
 dataset/tracking.xlsx
+SYN_COCO/
+weights/
+*.pt
+YOLO26/
+coco_val2017_yolo_REAL/
+val2017/
+annotations/
+*.zip
+*.cache
+
+# One-off generated outputs
+generated_car.png
+generated_car_boxed.png
+labels/
 
 # Python
 __pycache__/

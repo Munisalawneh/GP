@@ -34,7 +34,7 @@ from generate_images import sanitize_name
 
 GEMINI_URL = "https://gemini.google.com/app"
 PROFILES_DIR = os.path.join(os.path.dirname(__file__), ".playwright_profiles")
-NUM_ACCOUNTS = 4  # total accounts available
+NUM_ACCOUNTS = 10  # total accounts available
 TARGET_SIZE = (1408, 768)
 DOWNLOAD_WAIT_SEC = 150  # max wait for image generation
 
